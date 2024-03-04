@@ -1,5 +1,5 @@
 # myCloudDocs
-This repository is intended to be a place where to hold links to my gitbooks...
+Hi! This is myCloudDocs, my personal space for sharing documentation on cloud projects and web deployment. It's where I keep the practical stuff – guides, tips, and how-tos – from my hands-on experiences with AWS services. I hope you find these docs helpful!
 
  Name | Description | Link |  
 |------|-------------|------|
