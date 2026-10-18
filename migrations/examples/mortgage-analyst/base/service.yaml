@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mortgage-analyst
+spec:
+  selector: { app: mortgage-analyst }
+  ports:
+    - { name: http, port: 80, targetPort: http }

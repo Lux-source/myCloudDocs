@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - clustersecretstore.yaml
+images:
+  - name: mortgage-analyst
+    newName: 123456789012.dkr.ecr.eu-south-2.amazonaws.com/mortgage-analyst
+    newTag: "COMMIT_SHA"
+# EKS Pod Identity associates the service account with an IAM role outside the
+# manifests (Terraform: aws_eks_pod_identity_association), so no annotation is needed.

@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - clustersecretstore.yaml
+images:
+  - name: mortgage-analyst
+    newName: myregistry.azurecr.io/mortgage-analyst
+    newTag: "COMMIT_SHA"
+patches:
+  # Microsoft Entra Workload ID: federate the service account with a managed identity.
+  - target: { kind: ServiceAccount, name: mortgage-analyst }
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          azure.workload.identity/client-id: "00000000-0000-0000-0000-000000000000"
+  - target: { kind: Deployment, name: mortgage-analyst }
+    patch: |-
+      - op: add
+        path: /spec/template/metadata/labels/azure.workload.identity~1use
+        value: "true"

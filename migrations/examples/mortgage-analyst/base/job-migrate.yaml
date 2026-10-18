@@ -1,0 +1,28 @@
+# Runs Liquibase once per release, before the new pods start (Argo CD PreSync hook).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: liquibase-update
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 600
+  template:
+    spec:
+      serviceAccountName: mortgage-analyst
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: mortgage-analyst
+          envFrom:
+            - secretRef: { name: db-credentials }
+          env:
+            - { name: SPRING_MAIN_WEB_APPLICATION_TYPE, value: "none" }
+            - { name: MORTGAGEARB_SCHEDULING_ENABLED, value: "false" }
+            - { name: SPRING_LIQUIBASE_ENABLED, value: "true" }
+            - { name: TZ, value: "Europe/Madrid" }
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 768Mi }

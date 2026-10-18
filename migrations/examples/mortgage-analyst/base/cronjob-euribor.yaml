@@ -1,0 +1,34 @@
+# Monthly Euribor ingestion from Banco de España. Same schedule as the in-process
+# cron it replaces ("0 0 6 5 * *" in application.yml): day 5 at 06:00.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: euribor-ingestion
+spec:
+  schedule: "0 6 5 * *"
+  timeZone: "Europe/Madrid"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 900
+      template:
+        spec:
+          serviceAccountName: mortgage-analyst
+          restartPolicy: Never
+          containers:
+            - name: ingest
+              image: mortgage-analyst
+              envFrom:
+                - secretRef: { name: db-credentials }
+              env:
+                - { name: SPRING_MAIN_WEB_APPLICATION_TYPE, value: "none" }
+                - { name: SPRING_LIQUIBASE_ENABLED, value: "false" }
+                - { name: MORTGAGEARB_SCHEDULING_ENABLED, value: "false" }
+                - { name: MORTGAGEARB_RUN_ONCE, value: "euribor-ingestion" }
+                - { name: TZ, value: "Europe/Madrid" }
+              resources:
+                requests: { cpu: 250m, memory: 512Mi }
+                limits: { memory: 768Mi }
